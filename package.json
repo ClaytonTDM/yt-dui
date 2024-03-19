@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "electron": "^29.1.4"
+  },
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "@electron/remote": "^2.1.2"
+  }
+}
