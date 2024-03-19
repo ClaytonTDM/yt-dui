@@ -7,13 +7,14 @@
         <style>
             :root {
                 color-scheme: dark;
-                --bgPrimary: #202020;
-                --bgSecondary: #333;
-                --bgTertiary: #444;
-                --bgQuaternary: #555;
-                --bgQuinary: #777;
-                --bgSenary: #aaa;
+                --1: #202020;
+                --2: #333;
+                --3: #444;
+                --4: #555;
+                --5: #777;
+                --6: #aaa;
                 --accent: #bd90f4;
+                --accent2: #75529f;
             }
             h1,
             h2,
@@ -36,7 +37,7 @@
                 font-family: system-ui, -apple-system, BlinkMacSystemFont,
                     "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
                     "Helvetica Neue", sans-serif;
-                background-color: var(--bgPrimary);
+                background-color: var(--1);
                 color: #fff;
                 margin-left: 30px;
                 user-select: none;
@@ -45,10 +46,10 @@
                 font-family: system-ui, -apple-system, BlinkMacSystemFont,
                     "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
                     "Helvetica Neue", sans-serif;
-                background-color: var(--bgPrimary);
+                background-color: var(--1);
                 width: calc(100% - 53px);
                 color: #fff;
-                border: solid 2px var(--bgTertiary);
+                border: solid 2px var(--3);
                 padding: 10px;
                 margin-top: 5px;
                 margin-bottom: 1px;
@@ -69,6 +70,9 @@
             .brhalf {
                 margin-bottom: 7.5px;
             }
+            .br-75 {
+                margin-bottom: 11.25px;
+            }
             .right {
                 float: right;
                 margin-left: 6px;
@@ -83,14 +87,14 @@
                 padding-top: 3.5px;
                 padding-bottom: 3.5px;
                 border-radius: 5px;
-                background-color: var(--bgSecondary);
-                border: 2px solid var(--bgTertiary);
+                background-color: var(--2);
+                border: 2px solid var(--3);
             }
             select:focus {
                 outline: none;
             }
             .formatright {
-                margin: 0 30px 0 48px;
+                margin: 0 30px 0 0;
             }
             input[type="radio"] {
                 display: none;
@@ -102,12 +106,12 @@
                 height: 12.5px;
                 margin: 0 5px 0 5px;
                 border-radius: 50%;
-                border: 2px solid var(--bgQuinary);
+                border: 2px solid var(--5);
                 box-sizing: border-box;
-                background-color: var(--bgTertiary);
+                background-color: var(--3);
             }
             input[type="radio"]:checked + label:before {
-                background-color: var(--bgSecondary);
+                background-color: var(--2);
                 border: 4px solid var(--accent);
             }
             input[type="radio"].firstradio + label:before {
@@ -122,17 +126,17 @@
                 flex-grow: 1;
                 margin-right: 5px;
                 margin-bottom: 1px;
-                padding-top: 2px;
-                padding-bottom: 2px;
+                padding-top: 6.5px;
+                padding-bottom: 6.5px;
                 border-radius: 5px;
-                background-color: var(--bgPrimary);
-                border: 2px solid var(--bgTertiary);
-                border-bottom: 2px solid var(--bgQuaternary);
+                background-color: var(--1);
+                border: 2px solid var(--3);
+                border-bottom: 2px solid var(--4);
             }
             #file-name:focus {
                 outline: none;
                 margin-bottom: 0;
-                border-bottom: 3px solid var(--accent);
+                border-bottom: 3px solid var(--accent2);
             }
 
             button {
@@ -140,23 +144,23 @@
                 padding: 6.5px 40px 6.5px 40px;
                 border-radius: 5px;
                 margin-right: 30px;
-                background-color: var(--bgSecondary);
-                border: 2px solid var(--bgTertiary);
+                background-color: var(--2);
+                border: 2px solid var(--3);
             }
             button:hover {
-                background-color: var(--bgTertiary);
+                background-color: var(--3);
             }
             #download-button {
                 width: calc(100% - 30px);
             }
             #log {
                 border-radius: 0;
-                height: 1em;
-                font-family:'Courier New', Courier, monospace;
+                font-family: "Courier New", Courier, monospace;
                 color: #ccc;
+                overflow: hidden;
             }
             #version {
-                color: var(--bgSenary);
+                color: var(--6);
             }
         </style>
     </head>
@@ -172,8 +176,12 @@
 
         <div class="br"></div>
         <label for="type" class="">Download type</label>
-        <label for="format" class="right formatright">Format</label>
-        <label for="resolution" class="farright">Video resolution</label>
+        <label for="format" class="right formatright" id="formarlabel"
+            >Video format</label
+        >
+        <label for="resolution" class="farright" id="resolutionlabel"
+            >Video resolution</label
+        >
 
         <div class="brhalf"></div>
 
@@ -183,9 +191,10 @@
             id="video"
             name="type"
             value="video"
+            checked="true"
         />
         <label for="video">Video</label>
-        <input type="radio" id="audio" name="type" value="audio" />
+        <input type="radio" id="audio" name="type" value="audio" class />
         <label for="audio">Audio only</label>
 
         <select class="farright" name="format" id="videoformat">
@@ -216,7 +225,7 @@
         </select>
         <br /><br />
         <label for="outputdir">Output directory</label>
-        <br />
+        <div class="br-75"></div>
         <div class="file-upload">
             <input type="text" id="file-name" readonly />
             <button type="button" id="file-button">Browse...</button>
@@ -231,9 +240,11 @@
         <div class="br"></div>
         <button id="download-button">Start download</button>
         <div class="halfbr"></div>
-        <textarea disabled id="log" spellcheck="false">logs here blabla</textarea>
+        <textarea disabled id="log" spellcheck="false" rows="3">
+logs here blabla</textarea
+        >
         <div class="br"></div>
-        <label id="version">yt-dlp versionhereblabla</label>
+        <label id="version">yt-dlp</label>
         <script>
             document.getElementById("urls").placeholder =
                 "https://www.youtube.com/watch?v=dQw4w9WgXcQ\nhttps://www.youtube.com/watch?v=PUew7VIUfnA\netc...";
@@ -256,6 +267,99 @@
                             console.log(err);
                         });
                 });
+
+            let audioClicked = false;
+            document.getElementById("audio").addEventListener("click", () => {
+                audioClicked = true;
+                document.getElementById("videoformat").classList.add("hidden");
+                document
+                    .getElementById("audioformat")
+                    .classList.remove("hidden");
+                document.getElementById("resolution").classList.add("hidden");
+                document
+                    .getElementById("resolutionlabel")
+                    .classList.add("hidden");
+                document.getElementById("formarlabel").innerHTML =
+                    "Audio format";
+            });
+            document.getElementById("video").addEventListener("click", () => {
+                audioClicked = false;
+                document
+                    .getElementById("videoformat")
+                    .classList.remove("hidden");
+                document.getElementById("audioformat").classList.add("hidden");
+                document
+                    .getElementById("resolution")
+                    .classList.remove("hidden");
+                document
+                    .getElementById("resolutionlabel")
+                    .classList.remove("hidden");
+                document.getElementById("formarlabel").innerHTML =
+                    "Video format";
+            });
+
+            // using electron nodeintegration
+            // get yt-dlp version by running ./binary/yt-dlp --version
+            const { exec } = require("child_process");
+            exec("./binary/yt-dlp --version", (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`exec error: ${error}`);
+                    return;
+                }
+                document.getElementById("version").innerHTML =
+                    "yt-dlp " + stdout;
+            });
+
+            function log(log) {
+                document.getElementById("log").value = log;
+                document.getElementById("log").scrollTop =
+                    document.getElementById("log").scrollHeight;
+            }
+
+            const path = require('path');
+const YTDlpWrap = require('yt-dlp-wrap').default;
+
+// Add the directory containing yt-dlp, ffmpeg, and ffprobe to the PATH
+process.env.PATH += path.delimiter + path.join(__dirname, 'path/to/yt-dlp/binary');
+
+const ytDlpWrap = new YTDlpWrap('yt-dlp');
+
+document.getElementById("download-button").addEventListener("click", function () {
+    // Get the values of the input fields
+    const urls = document.getElementById("urls").value.split('\n');
+    const type = document.querySelector('input[name="type"]:checked').value;
+    const format = document.getElementById(type + 'format').value;
+    const resolution = document.getElementById("resolution").value;
+    const outputDir = document.getElementById("file-name").value;
+
+    // Set the options for the download
+    let options = [
+        '-f',
+        type === 'video' ? `bestvideo[height<=${resolution.replace('p', '')}]+bestaudio/best[ext=${format}]` : `bestaudio[ext=${format}]`,
+        '-o',
+        `${outputDir}/%(title)s.%(ext)s`
+    ];
+
+    // Download the video or audio for each URL
+    urls.forEach(url => {
+        let ytDlpEventEmitter = ytDlpWrap.exec([url, ...options])
+            .on('progress', (progress) =>
+                console.log(
+                    progress.percent,
+                    progress.totalSize,
+                    progress.currentSpeed,
+                    progress.eta
+                )
+            )
+            .on('ytDlpEvent', (eventType, eventData) =>
+                console.log(eventType, eventData)
+            )
+            .on('error', (error) => console.error(error))
+            .on('close', () => console.log('all done'));
+
+        console.log(ytDlpEventEmitter.ytDlpProcess.pid);
+    });
+});
         </script>
     </body>
 </html>
