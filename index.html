@@ -165,11 +165,11 @@
         </style>
     </head>
     <body>
-        <h1>Let's download stuff.</h1>
+        <h1 id="header">yt-dui</h1>
         <label for="urls">Source URLs</label>
         <textarea
             id="urls"
-            placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            placeholder="Playlists are not yet supported. Multiple URLs can be separated by a newline."
             rows="4"
             spellcheck="false"
         ></textarea>
@@ -252,8 +252,10 @@
         <div class="br"></div>
         <label id="version">Loading...</label>
         <script>
-            document.getElementById("urls").placeholder =
-                "https://www.youtube.com/watch?v=dQw4w9WgXcQ\nhttps://www.youtube.com/watch?v=PUew7VIUfnA\netc...";
+            let headers = ["Welcome.", "Hiya.", "Good today.", "Hello there.", "Moin.", "Hola.", "Greetings.", "Let's download stuff."];
+            document.getElementById('header').innerHTML = headers[Math.floor(Math.random() * headers.length)];
+            // document.getElementById("urls").placeholder =
+            //     "https://www.youtube.com/watch?v=dQw4w9WgXcQ\nhttps://www.youtube.com/watch?v=PUew7VIUfnA\netc...";
             const { dialog } = require("@electron/remote");
             document
                 .getElementById("file-button")
