@@ -212,16 +212,18 @@
             <option value="alac">ALAC</option>
             <option value="m4a">M4A</option>
             <option value="opus">OPUS</option>
-            <option value="vorbis">VORBIS</option>
+            <option value="vorbis">Vorbis (OGG)</option>
         </select>
 
         <select class="right" name="resolution" id="resolution">
-            <option value="1080p">1080p</option>
-            <option value="720p">720p</option>
-            <option value="480p">480p</option>
-            <option value="360p">360p</option>
-            <option value="240p">240p</option>
-            <option value="144p">144p</option>
+            <option value="4320">4320p</option>
+            <option value="2160">2160p</option>
+            <option value="1080">1080p</option>
+            <option value="720">720p</option>
+            <option value="480">480p</option>
+            <option value="360">360p</option>
+            <option value="240">240p</option>
+            <option value="144">144p</option>
         </select>
         <br /><br />
         <label for="outputdir">Output directory</label>
@@ -240,16 +242,19 @@
         <div class="br"></div>
         <button id="download-button">Start download</button>
         <div class="halfbr"></div>
-        <textarea disabled id="log" spellcheck="false" rows="3">
-logs here blabla</textarea
-        >
+        <textarea
+            disabled
+            id="log"
+            spellcheck="false"
+            rows="5"
+            placeholder="yt-dlp logs"
+        ></textarea>
         <div class="br"></div>
-        <label id="version">yt-dlp</label>
+        <label id="version">Loading...</label>
         <script>
             document.getElementById("urls").placeholder =
                 "https://www.youtube.com/watch?v=dQw4w9WgXcQ\nhttps://www.youtube.com/watch?v=PUew7VIUfnA\netc...";
             const { dialog } = require("@electron/remote");
-
             document
                 .getElementById("file-button")
                 .addEventListener("click", function () {
@@ -298,7 +303,6 @@ logs here blabla</textarea
                     "Video format";
             });
 
-            // using electron nodeintegration
             // get yt-dlp version by running ./binary/yt-dlp --version
             const { exec } = require("child_process");
             exec("./binary/yt-dlp --version", (error, stdout, stderr) => {
@@ -310,56 +314,55 @@ logs here blabla</textarea
                     "yt-dlp " + stdout;
             });
 
-            function log(log) {
-                document.getElementById("log").value = log;
+            function log(log, silent) {
+                console.log(log);
+                if (silent) return;
+                document.getElementById("log").value += log + "\n";
                 document.getElementById("log").scrollTop =
                     document.getElementById("log").scrollHeight;
             }
 
-            const path = require('path');
-const YTDlpWrap = require('yt-dlp-wrap').default;
+            const fs = require("fs");
+            document.getElementById("download-button").onclick = async () => {
+                // split urls by newline
+                let urls = document.getElementById("urls").value.split("\n");
+                let outputdir = document.getElementById("file-name").value;
+                if (!fs.existsSync(outputdir)) {
+                    log("Invalid output directory");
+                    return;
+                }
+                let useVideo = document.getElementById("video").checked;
+                let extension = document.getElementById("video").checked
+                    ? document.getElementById("videoformat").value
+                    : document.getElementById("audioformat").value;
+                let resolution = document.getElementById("resolution").value;
 
-// Add the directory containing yt-dlp, ffmpeg, and ffprobe to the PATH
-process.env.PATH += path.delimiter + path.join(__dirname, 'path/to/yt-dlp/binary');
-
-const ytDlpWrap = new YTDlpWrap('yt-dlp');
-
-document.getElementById("download-button").addEventListener("click", function () {
-    // Get the values of the input fields
-    const urls = document.getElementById("urls").value.split('\n');
-    const type = document.querySelector('input[name="type"]:checked').value;
-    const format = document.getElementById(type + 'format').value;
-    const resolution = document.getElementById("resolution").value;
-    const outputDir = document.getElementById("file-name").value;
-
-    // Set the options for the download
-    let options = [
-        '-f',
-        type === 'video' ? `bestvideo[height<=${resolution.replace('p', '')}]+bestaudio/best[ext=${format}]` : `bestaudio[ext=${format}]`,
-        '-o',
-        `${outputDir}/%(title)s.%(ext)s`
-    ];
-
-    // Download the video or audio for each URL
-    urls.forEach(url => {
-        let ytDlpEventEmitter = ytDlpWrap.exec([url, ...options])
-            .on('progress', (progress) =>
-                console.log(
-                    progress.percent,
-                    progress.totalSize,
-                    progress.currentSpeed,
-                    progress.eta
-                )
-            )
-            .on('ytDlpEvent', (eventType, eventData) =>
-                console.log(eventType, eventData)
-            )
-            .on('error', (error) => console.error(error))
-            .on('close', () => console.log('all done'));
-
-        console.log(ytDlpEventEmitter.ytDlpProcess.pid);
-    });
-});
+                for (let i = 0; i < urls.length; i++) {
+                    (async () => {
+                        const ytRegex = require("youtube-regex");
+                        let url = urls[i];
+                        if (ytRegex().test(url) === false) {
+                            log("Invalid URL: " + url || "Empty URL");
+                            return;
+                        }
+                        let commandVideo = `./binary/yt-dlp -f 'bestvideo[height<=${resolution}][ext=${extension}]+bestaudio[ext=m4a]/best[height<=${resolution}][ext=${extension}]/best' --ffmpeg-location ./binary -o "${outputdir}/%(title)s.%(ext)s" ${url}`;
+                        let commandAudio = `./binary/yt-dlp -x --audio-format ${extension} --ffmpeg-location ./binary -o "${outputdir}/%(title)s.%(ext)s" ${url}`;
+                        let command = useVideo ? commandVideo : commandAudio;
+                        log('Downloading video ' + (i + 1) + ' of ' + urls.length + ' (May not be in order)');
+                        exec(command, (error, stdout, stderr) => {
+                            if (error) {
+                                log(`exec error: ${error}`);
+                                return;
+                            }
+                            log(`stdout: ${stdout}`, true);
+                            log(`stderr: ${stderr}`, true);
+                            // Log a message when each download is complete
+                            log(`Download complete: (${i + 1}/${urls.length})`);
+                            completedDownloads++;
+                        });
+                    })();
+                }
+            };
         </script>
     </body>
 </html>
